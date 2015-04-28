@@ -18,6 +18,8 @@ def grid_search_cv(samples, targets, data, k, tuned_params):
     clf = grid_search.GridSearchCV(svr, tuned_params, cv=mycv)
     clf.fit(data, targets)
     print clf.best_params_
+    print clf.best_estimator_.predict(data[0])
+    print len(data[0])
     pickle.dump(clf.best_estimator_, open('SVMlin.pkl', 'w+'))
     return clf.best_estimator_
 
@@ -39,6 +41,8 @@ def parse_json(target_names):
     data = []
     targets = []
     s_expressions = get_common_ids(target_names)
+    # print len(s_expressions)
+    # print s_expressions
     for k in target_names:
         with open(target_names[k]) as fp:
             d = json.load(fp)
@@ -84,8 +88,8 @@ if __name__=='__main__':
 
     target_indices = np.array(targets)
 
-    parameters = {'C':[1, 10], 'class_weight':['auto'],
-                  'multi_class':['ovr', 'crammer_singer'], 'penalty':['l2'] }
+    parameters = {'C':[10], 'class_weight':['auto'],
+                  'multi_class':['ovr'], 'penalty':['l2'] }
    # parameters =  {'C': [1, 10, 100], 'gamma': [0.001, 0.0001], 'kernel': ['rbf', 'poly']}
     #parameters = {"n_estimators": [10, 20, 50], "n_jobs": [-1],"class_weight":['auto','subsample', None] }
     print "Grid search..."
