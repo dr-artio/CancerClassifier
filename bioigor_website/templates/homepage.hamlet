@@ -1,0 +1,22 @@
+<h1 align="center">Classifying cancer: a machine learning based approach
+
+<div>
+  <hr />
+    $maybe (info,con) <- submission
+      <div .message .alert .alert-success>
+        You have successfully uploaded the file <em>#{fileName info}</em>:
+        <div>
+          <ul>
+            <li> User email: #{user_email}
+            <li> Upload date: #{upload_date}
+            <li>
+              Prediction output: <b> #{predi} cancer
+  <li #form>
+    Please, upload a file with gene expression data.
+    <form method=post action=@{HomeR}#form enctype=#{formEnctype}>
+      ^{formWidget}
+      <button .btn .btn-primary type="submit">
+         Upload it! <span class="glyphicon glyphicon-upload"></span>
+  <hr />
+
+
