@@ -2,64 +2,71 @@ import json
 import csv
 import math
 
-difference = {}
 
-#the predicted cancer will tell us which of the [cancer]Avg.json files we have
+
+# the predicted cancer will tell us which of the [cancer]Avg.json files we have
 #to load.  It will be opened as Average_data below
 
 #one.tsv is single the patient input that the user submits
 with open('one.tsv') as csvfile:
-    reader = csv.reader(csvfile, delimiter='	')
+    reader = csv.reader(csvfile, delimiter='\t')
     reader.next()
     Specimen_Array = [[row[3], row[7], row[8]] for row in reader if 'GAF' in row[6]]
-with open ('BreastAvg.json') as filename:
-   Average_data = json.load(filename)
+with open('BreastAvg.json') as filename:
+    Average_data = json.load(filename)
 
 
 
 #variables to hold the 2 largest and smallest changes in gene expression
 #relative to the avg for that cancer
 
-Current_Largest_One = 0
-LargestID_One = ""
-Current_Largest_Two = 0
-LargestID_Two = ""
-Current_Smallest_One = 0
-SmallestID_One = ""
-Current_Smallest_Two = 0
-SmallestID_Two = ""
+def get_gene_ids(data, avg_data):
+    """
+    Function expects two dictionaries with
+    expression values and same set of keys
+    :param data:
+        First dict with current values
+    :param avg_data:
+        Second dict with avg values
+    :return:
+        GeneIDs 2 smallest and 2 largest
+    """
+    difference = {}
+    Current_Largest_One = 0
+    LargestID_One = ""
+    Current_Largest_Two = 0
+    LargestID_Two = ""
+    Current_Smallest_One = 0
+    SmallestID_One = ""
+    Current_Smallest_Two = 0
+    SmallestID_Two = ""
 
-for item in Specimen_Array:
-    if float(Average_data[item[1]] > 0.0):
-        difference[item[1]] = float(item[2]) / float(Average_data[item[1]])
-        if difference[item[1]] > Current_Largest_One:
-            Current_Largest_Two = Current_Largest_One
-            LargestID_Two = LargestID_One
-            Current_Largest_One = difference[item[1]]
-            LargestID_One = item[1]
-        elif difference[item[1]] > Current_Largest_Two:
-            Current_Largest_Two = difference[item[1]]
-            LargestID_Two = item[1]
+    for item in data:
+        value = data[item]
+        avg_value = avg_data[item]
 
-        #for biggest loss of expression we have to use difference between
-        #0 and the average cancer expression, if we do the above we simply
-        #get the first gene with 0
-        if float(item[2]) == 0.0:
-            if float(Average_data[item[1]]) > float(Current_Smallest_One):
+        if avg_value > 0:
+            difference[item] = value / avg_value
+            if difference[item] > Current_Largest_One:
+                 Current_Largest_Two = Current_Largest_One
+                 LargestID_Two = LargestID_One
+                 Current_Largest_One = difference[item]
+                 LargestID_One = item
+            elif difference[item] > Current_Largest_Two:
+                Current_Largest_Two = difference[item]
+                LargestID_Two = item
+        if value == 0:
+            if avg_value > float(Current_Smallest_One):
                 Current_Smallest_Two = float(Current_Smallest_One)
                 SmallestID_Two = SmallestID_One
-                Current_Smallest_One = float(Average_data[item[1]])
-                SmallestID_One = item[1]
-            elif float(Average[item[1]]) > float(Current_Smallest_Two):
-                Current_Smallest_Two = float(Average_data[item[1]])
-                SmallestID_Two = item[1]
+                Current_Smallest_One = float(Average_data[item])
+                SmallestID_One = item
+            elif float(Average_data[item]) > float(Current_Smallest_Two):
+                Current_Smallest_Two = float(Average_data[item])
+                SmallestID_Two = item
+
+    return SmallestID_One, SmallestID_Two, LargestID_One, LargestID_Two
 
 
-
-
-#print "Largest expression increase" , LargestID_One, ":", Current_Largest_One
-#print "Second expression increase" ,LargestID_Two, ":"  ,Current_Largest_Two
-#print "Largest Decrease in expresion", SmallestID_One, "by" ,Current_Smallest_One, "From Avg"
-#print "Second Largest Decrease in expresion" ,SmallestID_Two, "by" ,Current_Smallest_Two, "From Avg"
 
     
